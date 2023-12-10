@@ -2,7 +2,8 @@ import json
 from flask import Flask, render_template, request
 import requests  # Import the requests library to make HTTP requests
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField
+from wtforms import SubmitField, SelectField, FormField, FloatField, Form, SelectMultipleField
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -10,6 +11,18 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 # Configuration for the FastAPI backend URL
 FASTAPI_BACKEND_HOST = 'http://backend'
 
+def request_attr_list():
+    try:
+        # Make the HTTP request within the Flask request context
+        with app.test_request_context():
+            response = requests.get('http://backend/attractions')
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            # Assuming the backend returns a list of attractions as JSON
+            attr_list = response.json()
+            return attr_list
+    except requests.exceptions.RequestException as e:
+        print(f"Error in the request to the backend: {e}")
+        return None
 
 class SeachBnBForm(FlaskForm):
     n_attr = SelectField('How many attractions do you plan on visiting?:',
@@ -27,6 +40,15 @@ class SeachBnBForm(FlaskForm):
 
 
 class neighbourhoodBnbForm(FlaskForm):
+    sorting_key = SelectField('Sort by:', choices = [('price', 'Price'),
+                                                     ('review_scores_rating','Reviews')])
+    sorting_order = SelectField('Sorting Order:', choices= [(0,'Ascending'), (1,'Descending')])
+    submit = SubmitField('Search')
+
+
+class AdvancedSearch(FlaskForm):
+    selected_attractions = SelectMultipleField(choices=request_attr_list(), validators=[DataRequired()])
+    distance_m = FloatField('Distance (m)', render_kw={"step": "0.1"})
     sorting_key = SelectField('Sort by:', choices = [('price', 'Price'),
                                                      ('review_scores_rating','Reviews')])
     sorting_order = SelectField('Sorting Order:', choices= [(0,'Ascending'), (1,'Descending')])
@@ -126,10 +148,45 @@ def return_borough():
                 return render_template('neighbourhood.html',
                                     form=form,
                                     bnb_list=data,
+                                    neighbourhood = neighbourhood,
                                     error_message=error_message)
         else:
             error_message = f'Error: Unable to fetch data from FastAPI Backend'
-    return render_template('neighbourhood.html', form=form, result=None,
+    return render_template('neighbourhood.html', form=form, result=None, neighbourhood = neighbourhood,
+                           error_message=error_message)
+
+
+@app.route('/advanced', methods = ['GET', 'POST'])
+def advanced():
+    form = AdvancedSearch()
+    error_message = None
+    if form.validate_on_submit():
+        distance_m = form.distance_m.data
+        selected_attractions = form.selected_attractions.data
+        selected_attractions = str(selected_attractions)
+        distance_m = int(distance_m)
+        response = requests.get(
+            'http://backend/advanced',
+            params={
+                'attractions' : selected_attractions,
+                'range' : distance_m
+            }
+        )
+        if response.status_code == 200:
+            data = response.json()
+            data = json.loads(data)
+            data = [elem for elem in data]
+            if form.sorting_key.data == 'review_scores_rating':
+                data = sorted(data, key = lambda x: int(x[form.sorting_key.data]*100), reverse = bool(int(form.sorting_order.data)))
+            else: 
+                data = sorted(data, key = lambda x: x[form.sorting_key.data], reverse = bool(int(form.sorting_order.data)))
+            return render_template('advanced.html',
+                                form=form,
+                                bnb_list=data,
+                                error_message=error_message)
+        else:
+            error_message = f'Error: Unable to fetch data from FastAPI Backend'
+    return render_template('advanced.html', form=form, result=None,
                            error_message=error_message)
 
 if __name__ == '__main__':

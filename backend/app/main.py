@@ -1,14 +1,16 @@
 from fastapi import FastAPI
 from .mymodules import data_handling
+from .mymodules import advanced_research
 import pandas as pd
 import requests
 import time
+from ast import literal_eval
 
 app = FastAPI()
 
 
 # Creating dataframes with pandas
-attractions = pd.read_csv('Datasets/Locations.csv')
+attractions = pd.read_csv('Datasets/Location.csv')
 crime = pd.read_csv('Datasets/CrimeCount.csv')
 stations = pd.read_csv('Datasets/Stations.csv')
 trees = pd.read_csv('Datasets/Trees.csv')
@@ -82,3 +84,21 @@ def air_quality():
         airquality.append(neighborhood_dict)
 
     return airquality
+
+@app.get('/advanced')
+def airbnb_in_range(attractions, range):
+    attractions = literal_eval(attractions)
+    range = int(range)
+    center_point = advanced_research.calculate_center(attractions)
+    search_range = advanced_research.dist_to_deg(range, center_point)
+    filtered_df = advanced_research.find_airbnb_in_range(center_point, search_range)
+    list_of_dicts = filtered_df.to_json(orient = 'records')
+    return list_of_dicts
+
+
+@app.get('/attractions')
+def attraction_list():
+    attractions = advanced_research.get_attractions_list()
+
+    return attractions
+

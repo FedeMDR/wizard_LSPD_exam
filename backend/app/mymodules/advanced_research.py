@@ -3,8 +3,8 @@ import math
 import json
 
 #constants
-AIRBNB = pd.read_csv('backend/Datasets/AirBnb.csv')
-ATTRACTION = pd.read_csv('backend/Datasets/attractions.csv')
+AIRBNB = pd.read_csv('Datasets/AirBnb.csv')
+ATTRACTION = pd.read_csv('Datasets/Location.csv')
 EARTH_RADIUS = 6378137  # Earth's radius in meters
 CIRCUMFERENCE = 2 * math.pi * EARTH_RADIUS  # Earth's circumference in meters
 
@@ -15,6 +15,12 @@ class GeoCoords:
         self.latitude = latitude
         self.longitude = longitude
 
+def convert_price(price_str):
+    prezzo_float = float(price_str.replace('$', '').replace(',', ''))
+
+    return int(prezzo_float)
+
+AIRBNB['price'] = AIRBNB['price'].apply(convert_price)
 
 def calculate_center(selected_attractions):
     '''
@@ -29,13 +35,12 @@ def calculate_center(selected_attractions):
     # Load data from CSV
     # df = pd.read_csv(csv_file)
     df = ATTRACTION
-
     # Filter the data for selected attractions
     filtered_df = df[df['Tourist_Spot'].isin(selected_attractions)]
 
     # Calculate the average latitude and longitude
-    center_latitude = filtered_df['latitude'].mean()
-    center_longitude = filtered_df['longitude'].mean()
+    center_latitude = filtered_df['Latitude'].mean()
+    center_longitude = filtered_df['Longitude'].mean()
 
     return GeoCoords(center_latitude, center_longitude)
 
@@ -58,30 +63,6 @@ def is_within_range(lat, lon, center, range):
     return center.latitude - range <= lat <= center.latitude + range and \
            center.longitude - range <= lon <= center.longitude + range
 
-# def find_airbnb_in_range(airbnb_list, center, range):
-#     in_range_airbnbs = []
-#     for airbnb in airbnb_list:
-#         if is_within_range(airbnb['latitude'], airbnb['longitude'], center, range):
-#             in_range_airbnbs.append(airbnb)
-#     return in_range_airbnbs
-
-def find_airbnb_in_range(center, range):
-    
-    # List to store in-range Airbnb entries
-    in_range_airbnbs = []
-
-    # Iterate through the DataFrame
-    for index, row in AIRBNB.iterrows():
-        # Check if the Airbnb is within range
-        if is_within_range(row['latitude'], row['longitude'], center, range):
-            # Append the Airbnb entry to the list
-            in_range_airbnbs.append(row)
-
-    # Convert the list of in-range Airbnbs to a DataFrame
-    filtered_airbnb_dataset = pd.DataFrame(in_range_airbnbs)
-
-    return filtered_airbnb_dataset
-
 def dist_to_deg(dist, center):
 
     '''
@@ -99,3 +80,13 @@ def dist_to_deg(dist, center):
     var_degree = dist / conversion_factor
 
     return var_degree
+
+def find_airbnb_in_range(center, range):
+    filtered_airbnb = AIRBNB[AIRBNB.apply(lambda row: is_within_range(row['latitude'], row['longitude'], center, range), axis=1)]
+    return filtered_airbnb
+
+
+def get_attractions_list():    
+    # Ottieni la lista delle attrazioni dal DataFrame
+    attractions_list = ATTRACTION['Tourist_Spot'].tolist()
+    return [(attraction, attraction) for attraction in attractions_list]

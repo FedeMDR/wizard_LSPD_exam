@@ -9,12 +9,16 @@
     </head>
     <body>
         <div class="container mt-5">
-            <h1>Look for your AirBnb in {{ neighbourhood }}</h1>
+            <h1>Look for the  closest AirBnbs to the locations you want to visit</h1>
     
             <!-- WTForms Form to get input from the user -->
             <form method="POST" action="">
                 {{ form.csrf_token }}
                 <div class="form-group">
+                    {{ form.distance_m.label}}
+                    {{ form.distance_m(class="form-control") }}
+                    {{ form.selected_attractions.label}}
+                    {{ form.selected_attractions(class="form-control") }}
                     {{ form.sorting_key.label }}
                     {{ form.sorting_key(class="form-control") }}
                     {{ form.sorting_order.label }}
