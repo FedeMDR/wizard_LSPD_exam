@@ -8,6 +8,13 @@ trees = pd.read_csv('Datasets/Trees.csv')
 zip = pd.read_csv('Datasets/zip_neighbourhood.csv')
 bnb = pd.read_csv('Datasets/AirBnb.csv')
 
+def convert_price(price_str):
+    prezzo_float = float(price_str.replace('$', '').replace(',', ''))
+
+    return int(prezzo_float)
+
+bnb['price'] = bnb['price'].apply(convert_price)
+
 
 # Finds zipcodes that respects the criteria for the number of attractions
 def corrZipAtt(min, max):
