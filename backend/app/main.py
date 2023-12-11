@@ -95,10 +95,19 @@ def airbnb_in_range(attractions, range):
     list_of_dicts = filtered_df.to_json(orient = 'records')
     return list_of_dicts
 
+@app.get('/map')
+def get_map_data(attraction):
+    attractions_list = literal_eval(attraction)
+    print(attractions_list)
+    extracted_attractions = attractions[attractions['Tourist_Spot'].isin(attractions_list)][['Tourist_Spot', 'Latitude', 'Longitude']]
+    list_of_dicts = extracted_attractions.to_json(orient = 'records')
+    return list_of_dicts
+
 
 @app.get('/attractions')
 def attraction_list():
     attractions = advanced_research.get_attractions_list()
 
     return attractions
+
 

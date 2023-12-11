@@ -4,6 +4,7 @@ import requests  # Import the requests library to make HTTP requests
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, FormField, FloatField, Form, SelectMultipleField
 from wtforms.validators import DataRequired
+from ast import literal_eval
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -172,10 +173,21 @@ def advanced():
                 'range' : distance_m
             }
         )
-        if response.status_code == 200:
+        response_attractions = requests.get(
+            'http://backend/map',
+            params={
+                'attraction' : selected_attractions
+            }
+        )
+        if response.status_code == 200 and response_attractions.status_code == 200:
             data = response.json()
             data = json.loads(data)
             data = [elem for elem in data]
+
+            attractions = response_attractions.json()
+            attractions = json.loads(attractions)
+            attractions = [elem for elem in attractions]
+
             if form.sorting_key.data == 'review_scores_rating':
                 data = sorted(data, key = lambda x: int(x[form.sorting_key.data]*100), reverse = bool(int(form.sorting_order.data)))
             else: 
@@ -183,6 +195,7 @@ def advanced():
             return render_template('advanced.html',
                                 form=form,
                                 bnb_list=data,
+                                attractions  = attractions,
                                 error_message=error_message)
         else:
             error_message = f'Error: Unable to fetch data from FastAPI Backend'
