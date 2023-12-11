@@ -40,20 +40,29 @@ def search_bnb(min, max, trees_bool, crime_rate ):
     zipcodes_attr = data_handling.corrZipAtt(min, max)
     zipcodes_trees = data_handling.corrZipTrees(trees_bool)
     zipcodes_crime = data_handling.corrZipCrime(crime_rate)
-    
-    res = data_handling.commonZip(zipcodes_attr, zipcodes_crime, zipcodes_trees)
 
-    val = data_handling.BnbPerZip(res, bnb)
 
-    list_of_dicts = val.to_json(orient='records')
+    if(zipcodes_attr and zipcodes_trees and zipcodes_crime):
+        res = data_handling.commonZip(zipcodes_attr, zipcodes_crime, zipcodes_trees)
 
-    return list_of_dicts
+        val = data_handling.BnbPerZip(res, bnb)
+
+        list_of_dicts = val.to_json(orient='records')
+
+        return list_of_dicts
+    else:
+        return {"error": "Data not found"}
+
 
 @app.get('/neighbourhood')
 def get_borough(neighbourhood):
     data = data_handling.get_bnb_by_neighborhood(neighbourhood)
-    list = data.to_json(orient='records')
-    return list
+    if (type(data)==pd.DataFrame):
+        if not(data.empty):
+            list = data.to_json(orient='records')
+            return list
+    else:
+        return {"error": "Data not found"}
 
 
 @app.get('/advanced')
@@ -65,6 +74,7 @@ def airbnb_in_range(attractions, range):
     filtered_df = advanced_research.find_airbnb_in_range(center_point, search_range)
     list_of_dicts = filtered_df.to_json(orient = 'records')
     return list_of_dicts
+
 
 @app.get('/map')
 def get_map_data(attraction):
@@ -80,5 +90,3 @@ def attraction_list():
     attractions = advanced_research.get_attractions_list()
 
     return attractions
-
-
