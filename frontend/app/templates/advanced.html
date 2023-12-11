@@ -2,73 +2,160 @@
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> {% block title %} Search of Frontend {% endblock %}</title>
-    </head>
-    <body>
-        <div class="container mt-5">
-            <h1>Look for the  closest AirBnbs to the locations you want to visit</h1>
-    
-            <!-- WTForms Form to get input from the user -->
-            <form method="POST" action="">
-                {{ form.csrf_token }}
-                <div class="form-group">
-                    {{ form.distance_m.label}}
-                    {{ form.distance_m(class="form-control") }}
-                    {{ form.selected_attractions.label}}
-                    {{ form.selected_attractions(class="form-control") }}
-                    {{ form.sorting_key.label }}
-                    {{ form.sorting_key(class="form-control") }}
-                    {{ form.sorting_order.label }}
-                    {{ form.sorting_order(class="form-control") }}
-                </div>
-                </br>
-                {{ form.submit(class="btn btn-primary") }}
-            </form>
-            </br>
-            {% if form.validate_on_submit() %}
-                {% if bnb_list %}
-                    {% for item in bnb_list %}
-                        <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; width: 80%; word-wrap: break-word; overflow: hidden; display: flex; flex-direction: column;">
-                            <div style="overflow: hidden;">
-                                <h3 style="margin: 0;">{{ item['name'] }}</h3>
-                            </div>
-                
-                            <div style="display: flex;">
-                                <div style="flex: 0 0 30%; margin-right: 10px;">
-                                    <br>
-                                    <img src="{{ item['picture_url'] }}" alt="Immagine" style="width: 100%; height: auto;">
-                                </div>
-                            </div>
-                            <div style="flex: 1;">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} Search of Frontend {% endblock %}</title>
+    <!-- Include Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Include Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Map -->
+        <div id="map" style="height: 400px;"></div>
+
+        <!-- Add Leaflet script only once -->
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script>
+            var attractionsLayer = L.layerGroup();
+            var airbnbLayer = L.layerGroup();
+            var map; 
+
+            document.addEventListener("DOMContentLoaded", function() {
+                map = L.map('map').setView([40.7128, -74.0060], 10);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Define a custom icon for attractions
+                var attractionIcon = L.icon({
+                    iconUrl: 'static/attraction_icon.png', // Specify the path to your custom icon
+                    iconSize: [32, 32], // Size of the icon
+                    iconAnchor: [16, 32], // Anchor point of the icon
+                    popupAnchor: [0, -32] // Popup anchor relative to the icon
+                });
+
+                // Optional: Add initial attractions markers
+                {% for attraction in attractions %}
+                    var attractionLat = parseFloat("{{ attraction.Latitude|safe }}");
+                    var attractionLng = parseFloat("{{ attraction.Longitude|safe }}");
+
+                    var attractionMarker = L.marker([attractionLat, attractionLng], {icon: attractionIcon});
+                    attractionMarker.bindPopup("<b>{{ attraction.Tourist_Spot|safe }}</b><br>Attraction details here.");
+                    attractionsLayer.addLayer(attractionMarker);
+                {% endfor %}
+                attractionsLayer.addTo(map);
+
+                // Add Airbnb markers
+                {% if form.validate_on_submit() %}
+                    {% if bnb_list %}
+
+                            var firstAirbnbLat = parseFloat("{{ bnb_list[0].latitude|safe }}");
+                            var firstAirbnbLng = parseFloat("{{ bnb_list[0].longitude|safe }}");
+                            map.setView([firstAirbnbLat, firstAirbnbLng], 12);
+
+                        {% for item in bnb_list %}
+                            var airbnbLat = parseFloat("{{ item.latitude|safe }}");
+                            var airbnbLng = parseFloat("{{ item.longitude|safe }}");
+
+                            var airbnbMarker = L.marker([airbnbLat, airbnbLng]);
+                            airbnbMarker.bindPopup("<b>{{ item.name|safe }}</b><br>Other details can go here.");
+                            airbnbLayer.addLayer(airbnbMarker);
+                        {% endfor %}
+                    {% endif %}
+                {%endif%}
+                airbnbLayer.addTo(map);
+
+                // Create control layers
+                var overlayMaps = {
+                    "Attractions": attractionsLayer,
+                    "Airbnb": airbnbLayer
+                };
+
+                L.control.layers(null, overlayMaps, { position: 'topright' }).addTo(map);
+
+                // Add a legend
+                var legend = L.control({position: 'bottomright'});
+
+                legend.onAdd = function (map) {
+                    var div = L.DomUtil.create('div', 'info legend');
+                    div.innerHTML += '<img src="static/attraction_icon.png" alt="Attraction Icon" width="16" height="16"> Attractions';
+                    div.innerHTML += '<br>';
+                    div.innerHTML += '<i class="fas fa-map-marker-alt"></i> Airbnb';
+
+                    return div;
+                };
+
+                legend.addTo(map);
+            });
+        </script>
+
+        <!-- Rest of the content -->
+        <h1>Look for the closest AirBnbs to the locations you want to visit</h1>
+
+        <!-- WTForms Form to get input from the user -->
+        <form method="POST" action="">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.distance_m.label}}
+                {{ form.distance_m(class="form-control") }}
+                {{ form.selected_attractions.label}}
+                {{ form.selected_attractions(class="form-control") }}
+                {{ form.sorting_key.label }}
+                {{ form.sorting_key(class="form-control") }}
+                {{ form.sorting_order.label }}
+                {{ form.sorting_order(class="form-control") }}
+            </div>
+            <br>
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+        <br>
+
+        {% if form.validate_on_submit() %}
+            {% if bnb_list %}
+                {% for item in bnb_list %}
+                    <!-- Airbnb content -->
+                    <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; width: 80%; word-wrap: break-word; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="overflow: hidden;">
+                            <h3 style="margin: 0;">{{ item['name'] }}</h3>
+                        </div>
+
+                        <div style="display: flex;">
+                            <div style="flex: 0 0 30%; margin-right: 10px;">
                                 <br>
-                                <p>
-                                    <b style="font-size: larger;">
-                                        Price:
-                                        {{ item['price'] }}$ per night
-                                    </b>
-                                    <br><br> 
-                                    <b>Description</b>
-                                    <br>
-                                    {{ item['description']|safe }}
-                                    <br><br>
-                                    <b>Review Score</b>
-                                    {{ item['review_scores_rating']|safe}}
-                                    <br><br>
-                                    <p>
-                                        <b><a href="{{ item['listing_url'] }}" target="_blank">Book this spot on AirBnb.com</a></b>
-                                    </p>
-                                </p>
+                                <img src="{{ item['picture_url'] }}" alt="Immagine" style="width: 100%; height: auto;">
                             </div>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <h3 style="margin: 0;">Your search did't produce any result</h3>
-                {% endif %}
+                        <div style="flex: 1;">
+                            <br>
+                            <p>
+                                <b style="font-size: larger;">
+                                    Price:
+                                    {{ item['price'] }}$ per night
+                                </b>
+                                <br><br> 
+                                <b>Description</b>
+                                <br>
+                                {{ item['description']|safe }}
+                                <br><br>
+                                <b>Review Score</b>
+                                {{ item['review_scores_rating']|safe}}
+                                <br><br>
+                                <p>
+                                    <b><a href="{{ item['listing_url'] }}" target="_blank">Book this spot on AirBnb.com</a></b>
+                                </p>
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h3 style="margin: 0;">Your search didn't produce any result</h3>
             {% endif %}
-        </div>
-    </body>
+        {% endif %}
+    </div>
+</body>
 </html>
 {% endblock %}
