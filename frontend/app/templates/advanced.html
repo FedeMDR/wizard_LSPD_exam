@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <!-- Include Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="static/popup.css">
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -27,7 +29,7 @@
                 map = L.map('map').setView([40.7128, -74.0060], 10);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
+                    attribution: '©️ OpenStreetMap contributors'
                 }).addTo(map);
 
                 // Define a custom icon for attractions
@@ -115,6 +117,25 @@
         <br>
 
         {% if form.validate_on_submit() %}
+            {% if error_message %}
+                <div class="popup" id="errorPopup">
+                    <p style="color: red;">{{ error_message }}</p>
+                    <button onclick="closePopup()">Close</button>
+                </div>
+        
+                <!-- JavaScript to show the popup -->
+                <script>
+                    // Show the error popup when the page loads
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('errorPopup').style.display = 'block';
+                    });
+        
+                    // Close the popup
+                    function closePopup() {
+                        document.getElementById('errorPopup').style.display = 'none';
+                    }
+                </script>
+            {% endif %}
             {% if bnb_list %}
                 {% for item in bnb_list %}
                     <!-- Airbnb content -->

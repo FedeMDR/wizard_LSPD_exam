@@ -6,6 +6,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title> {% block title %} Search of Frontend {% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="static/popup.css">
     </head>
     <body>
         <div class="container mt-5">
@@ -25,6 +26,25 @@
             </form>
             </br>
             {% if form.validate_on_submit() %}
+            {% if error_message %}
+                <div class="popup" id="errorPopup">
+                    <p style="color: red;">{{ error_message }}</p>
+                    <button onclick="closePopup()">Close</button>
+                </div>
+        
+                <!-- JavaScript to show the popup -->
+                <script>
+                    // Show the error popup when the page loads
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('errorPopup').style.display = 'block';
+                    });
+        
+                    // Close the popup
+                    function closePopup() {
+                        document.getElementById('errorPopup').style.display = 'none';
+                    }
+                </script>
+            {% endif %}
                 {% if bnb_list %}
                     {% for item in bnb_list %}
                         <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; width: 80%; word-wrap: break-word; overflow: hidden; display: flex; flex-direction: column;">

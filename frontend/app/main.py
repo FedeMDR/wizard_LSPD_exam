@@ -2,8 +2,9 @@ import json
 from flask import Flask, render_template, request
 import requests  # Import the requests library to make HTTP requests
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField, FormField, FloatField, Form, SelectMultipleField
-from wtforms.validators import DataRequired
+from wtforms import SubmitField, SelectField, IntegerField, SelectMultipleField
+from wtforms.validators import DataRequired, NumberRange
+
 from ast import literal_eval
 
 app = Flask(__name__)
@@ -49,7 +50,7 @@ class neighbourhoodBnbForm(FlaskForm):
 
 class AdvancedSearch(FlaskForm):
     selected_attractions = SelectMultipleField(choices=request_attr_list(), validators=[DataRequired()])
-    distance_m = FloatField('Distance (m)', render_kw={"step": "0.1"})
+    distance_m = IntegerField('Distance (m)', validators=[NumberRange(min=0), DataRequired()])
     sorting_key = SelectField('Sort by:', choices = [('price', 'Price'),
                                                      ('review_scores_rating','Reviews')])
     sorting_order = SelectField('Sorting Order:', choices= [(0,'Ascending'), (1,'Descending')])
@@ -58,12 +59,14 @@ class AdvancedSearch(FlaskForm):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    response = requests.get('http://backend/index')
+    response = requests.get('http://backend/index/596dff3ac05aeb906e63803d2bfcf01a')
     error_message = None
 
     if response.status_code == 200:
         data = response.json()
         return render_template('index.html', borough_list = data)
+    elif response.status_code == 404:
+        error_message = f"Error: {response.json().get('detail')}"
     else:
         error_message = f'Error: Unable to fetch data from FastAPI Backend'
         return render_template('index.html', error_message=error_message)
@@ -151,6 +154,8 @@ def return_borough():
                                     bnb_list=data,
                                     neighbourhood = neighbourhood,
                                     error_message=error_message)
+        elif response.status_code == 404:
+            error_message = f"Error: {response.json().get('detail')}"
         else:
             error_message = f'Error: Unable to fetch data from FastAPI Backend'
     return render_template('neighbourhood.html', form=form, result=None, neighbourhood = neighbourhood,
@@ -197,8 +202,13 @@ def advanced():
                                 bnb_list=data,
                                 attractions  = attractions,
                                 error_message=error_message)
+        elif response.status_code == 422:
+            error_message = f"Error: {response.json().get('detail')}"
+
+        elif response.status_code == 404:
+            error_message = f"Error: {response.json().get('detail')}"
         else:
-            error_message = f'Error: Unable to fetch data from FastAPI Backend'
+            error_message = 'Error: Unable to fetch data from FastAPI Backend'
     return render_template('advanced.html', form=form, result=None,
                            error_message=error_message)
 

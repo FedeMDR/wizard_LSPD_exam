@@ -18,37 +18,48 @@ bnb['price'] = bnb['price'].apply(convert_price)
 
 # Finds zipcodes that respects the criteria for the number of attractions
 def corrZipAtt(min, max):
-    counts_by_zipcode = attractions.groupby('Zipcode')['Tourist_Spot'].count().reset_index()
-    filtered_locations = counts_by_zipcode[(counts_by_zipcode['Tourist_Spot'] >= min) & (counts_by_zipcode['Tourist_Spot'] <= max)]
-    return filtered_locations['Zipcode'].tolist()
+    zipcodes_attr = None
+    if(min>=0 and max<=20):
+        counts_by_zipcode = attractions.groupby('Zipcode')['Tourist_Spot'].count().reset_index()
+        filtered_locations = counts_by_zipcode[(counts_by_zipcode['Tourist_Spot'] >= min) & (counts_by_zipcode['Tourist_Spot'] <= max)]
+        zipcodes_attr = filtered_locations['Zipcode'].tolist()
+        return zipcodes_attr
+    else:
+        return zipcodes_attr
 
 
 # Finds zipcodes that respects the criteria for green areas
 def corrZipTrees(trees_bool):
+    zipcodes_trees = None
     if(trees_bool == 'True'):
         trees_mean = int(trees['count'].mean())
         zipcodes_trees = trees[trees['count'] >= trees_mean]['zipcode'].tolist()
-    else:
+        return zipcodes_trees
+    elif(trees_bool == 'False'):
         zipcodes_trees = trees['zipcode'].tolist()
-    
-    return zipcodes_trees
+        return zipcodes_trees
+    else:
+        return zipcodes_trees
 
 
 # Finds zipcodes that respects the criteria for crime rates
 def corrZipCrime(crime_rate):
-    if(crime_rate == 4):
-        crime_threshold = int(((crime['count'].max()-crime['count'].min())/4)+crime['count'].min())
-        zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
-    elif(crime_rate == 3):
-        crime_threshold = int(((crime['count'].max()-crime['count'].min())/2)+crime['count'].min())
-        zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
-    elif(crime_rate == 2):
-        crime_threshold = int(((((crime['count'].max()-crime['count'].min())/4))*3)+crime['count'].min())
-        zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
-    elif(crime_rate == 1):
-        zipcodes_crime = crime['zipcode'].tolist()
-
-    return zipcodes_crime
+    zipcodes_crime = None
+    if(crime_rate>=1 or crime_rate<=4):
+        if(crime_rate == 4):
+            crime_threshold = int(((crime['count'].max()-crime['count'].min())/4)+crime['count'].min())
+            zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
+        elif(crime_rate == 3):
+            crime_threshold = int(((crime['count'].max()-crime['count'].min())/2)+crime['count'].min())
+            zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
+        elif(crime_rate == 2):
+            crime_threshold = int(((((crime['count'].max()-crime['count'].min())/4))*3)+crime['count'].min())
+            zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
+        elif(crime_rate == 1):
+            zipcodes_crime = crime['zipcode'].tolist()
+        return zipcodes_crime
+    else:
+        return zipcodes_crime
 
 
 # Finds common zipcodes among three lists
@@ -63,10 +74,15 @@ def BnbPerZip(zip_list, bnb_df):
     
     return airbnb_df
 
+
 def get_bnb_by_neighborhood(target_neighborhood):
-    neighborhood_df = bnb[bnb['neighbourhood_group_cleansed'] == target_neighborhood]
-
-    # Convert the filtered DataFrame to a list of dictionaries
-    #result_list = neighborhood_df.to_dict(orient='records')
-
-    return neighborhood_df.head(50)
+    neighborhood_list = ['Manhattan', 'Bronx', 'Queens', 'Staten Island', 'Brooklyn']
+    neighborhood_df = None
+    if(type(target_neighborhood) == str):
+        if(target_neighborhood in neighborhood_list):
+            neighborhood_df = bnb[bnb['neighbourhood_group_cleansed'] == target_neighborhood]
+            return neighborhood_df.head(50)
+        else:
+            return neighborhood_df
+    else:
+        return neighborhood_df
