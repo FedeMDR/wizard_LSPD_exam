@@ -58,12 +58,14 @@ class AdvancedSearch(FlaskForm):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    response = requests.get('http://backend/index')
+    response = requests.get('http://backend/index/596dff3ac05aeb906e63803d2bfcf01a')
     error_message = None
 
     if response.status_code == 200:
         data = response.json()
         return render_template('index.html', borough_list = data)
+    elif response.status_code == 404:
+        error_message = f"Error: {response.json().get('detail')}"
     else:
         error_message = f'Error: Unable to fetch data from FastAPI Backend'
         return render_template('index.html', error_message=error_message)

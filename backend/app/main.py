@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from .mymodules import data_handling
 from .mymodules import advanced_research
 from .mymodules import air_quality
@@ -26,10 +26,13 @@ def convert_price(price_str):
 bnb['price'] = bnb['price'].apply(convert_price)
 
 
-@app.get('/index')
-def get_air_quality():
-    data = air_quality.air_quality()
-    return data
+@app.get('/index/{key}')
+def get_air_quality(key):
+    try:
+        data = air_quality.air_quality(key)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=404, detail='Unfortunately we were not able to access OpenWheather API')
 
 
 @app.get('/search')
