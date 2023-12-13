@@ -6,6 +6,21 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title> {% block title %} Search of Frontend {% endblock %}</title>
+        <style>
+            /* Styles for the popup */
+            .popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 20px;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+            }
+        </style>
     </head>
     <body>
         
@@ -13,6 +28,25 @@
             <img src="static/tour-manhattan-589x392.jpg.avif" class="card-img-top img-fluid" alt="...">
             <div class="card-body">
                 <h5 class="card-title">Manhattan</h5>
+                {% if error_message %}
+                <div class="popup" id="errorPopup">
+                    <p style="color: red;">{{ error_message }}</p>
+                    <button onclick="closePopup()">Close</button>
+                </div>
+        
+                <!-- JavaScript to show the popup -->
+                <script>
+                    // Show the error popup when the page loads
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('errorPopup').style.display = 'block';
+                    });
+        
+                    // Close the popup
+                    function closePopup() {
+                        document.getElementById('errorPopup').style.display = 'none';
+                    }
+                </script>
+            {% endif %}
                 {% for item in borough_list %}
                     {% if item['Neighborhood'] == 'Manhattan' %}
                         <p class="card-text">

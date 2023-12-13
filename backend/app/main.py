@@ -31,7 +31,7 @@ def get_air_quality(key):
     try:
         data = air_quality.air_quality(key)
         return data
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=404, detail='Unfortunately we were not able to access OpenWheather API')
 
 
