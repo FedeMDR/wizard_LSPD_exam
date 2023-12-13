@@ -18,48 +18,47 @@ bnb['price'] = bnb['price'].apply(convert_price)
 
 # Finds zipcodes that respects the criteria for the number of attractions
 def corrZipAtt(min, max):
-    zipcodes_attr = None
-    if(min>=0 and max<=20):
-        counts_by_zipcode = attractions.groupby('Zipcode')['Tourist_Spot'].count().reset_index()
-        filtered_locations = counts_by_zipcode[(counts_by_zipcode['Tourist_Spot'] >= min) & (counts_by_zipcode['Tourist_Spot'] <= max)]
-        zipcodes_attr = filtered_locations['Zipcode'].tolist()
-        return zipcodes_attr
-    else:
-        return zipcodes_attr
+    # if(min>=0 and max<=20):
+    counts_by_zipcode = attractions.groupby('Zipcode')['Tourist_Spot'].count().reset_index()
+    filtered_locations = counts_by_zipcode[(counts_by_zipcode['Tourist_Spot'] >= min) & (counts_by_zipcode['Tourist_Spot'] <= max)]
+    zipcodes_attr = filtered_locations['Zipcode'].tolist()
+    
+    return zipcodes_attr
 
 
 # Finds zipcodes that respects the criteria for green areas
 def corrZipTrees(trees_bool):
-    zipcodes_trees = None
-    if(trees_bool == 'True'):
-        trees_mean = int(trees['count'].mean())
-        zipcodes_trees = trees[trees['count'] >= trees_mean]['zipcode'].tolist()
-        return zipcodes_trees
-    elif(trees_bool == 'False'):
-        zipcodes_trees = trees['zipcode'].tolist()
-        return zipcodes_trees
+    if trees_bool == 'True' or trees_bool == 'False':
+        if(trees_bool == 'True'):
+            trees_mean = int(trees['count'].mean())
+            zipcodes_trees = trees[trees['count'] >= trees_mean]['zipcode'].tolist()
+            return zipcodes_trees
+        elif(trees_bool == 'False'):
+            zipcodes_trees = trees['zipcode'].tolist()
+            return zipcodes_trees
     else:
-        return zipcodes_trees
+        raise ValueError()
 
 
 # Finds zipcodes that respects the criteria for crime rates
 def corrZipCrime(crime_rate):
-    zipcodes_crime = None
-    if(crime_rate>=1 or crime_rate<=4):
-        if(crime_rate == 4):
-            crime_threshold = int(((crime['count'].max()-crime['count'].min())/4)+crime['count'].min())
-            zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
-        elif(crime_rate == 3):
-            crime_threshold = int(((crime['count'].max()-crime['count'].min())/2)+crime['count'].min())
-            zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
-        elif(crime_rate == 2):
-            crime_threshold = int(((((crime['count'].max()-crime['count'].min())/4))*3)+crime['count'].min())
-            zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
-        elif(crime_rate == 1):
-            zipcodes_crime = crime['zipcode'].tolist()
-        return zipcodes_crime
-    else:
-        return zipcodes_crime
+    # if isinstance(crime_rate, int):
+        # if(crime_rate>=1 or crime_rate<=4):
+            if(crime_rate == 4):
+                crime_threshold = int(((crime['count'].max()-crime['count'].min())/4)+crime['count'].min())
+                zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
+            elif(crime_rate == 3):
+                crime_threshold = int(((crime['count'].max()-crime['count'].min())/2)+crime['count'].min())
+                zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
+            elif(crime_rate == 2):
+                crime_threshold = int(((((crime['count'].max()-crime['count'].min())/4))*3)+crime['count'].min())
+                zipcodes_crime = crime[crime['count'] <= crime_threshold]['zipcode'].tolist()
+            elif(crime_rate == 1):
+                zipcodes_crime = crime['zipcode'].tolist()
+            return zipcodes_crime
+        # else:
+        #     raise ValueError("Input crime_rate must be an integer.")
+    
 
 
 # Finds common zipcodes among three lists
@@ -77,12 +76,11 @@ def BnbPerZip(zip_list, bnb_df):
 
 def get_bnb_by_neighborhood(target_neighborhood):
     neighborhood_list = ['Manhattan', 'Bronx', 'Queens', 'Staten Island', 'Brooklyn']
-    neighborhood_df = None
-    if(type(target_neighborhood) == str):
-        if(target_neighborhood in neighborhood_list):
-            neighborhood_df = bnb[bnb['neighbourhood_group_cleansed'] == target_neighborhood]
-            return neighborhood_df.head(50)
-        else:
-            return neighborhood_df
-    else:
-        return neighborhood_df
+    if target_neighborhood not in neighborhood_list:
+        target_neighborhood == None
+    if not target_neighborhood:
+        raise ValueError("Input must be a string.")
+    if target_neighborhood in neighborhood_list:
+        neighborhood_df = bnb[bnb['neighbourhood_group_cleansed'] == target_neighborhood]
+        return neighborhood_df.head(50)
+    
