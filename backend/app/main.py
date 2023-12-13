@@ -3,7 +3,7 @@ from .mymodules import data_handling
 from .mymodules import advanced_research
 from .mymodules import air_quality
 import pandas as pd
-
+from fastapi import HTTPException
 from ast import literal_eval
 
 app = FastAPI()
@@ -31,52 +31,62 @@ def get_air_quality(key):
     try:
         data = air_quality.air_quality(key)
         return data
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=404, detail='Unfortunately we were not able to access OpenWheather API')
 
 
 @app.get('/search')
 def search_bnb(min, max, trees_bool, crime_rate ):
-    min = int(min)
-    max = int(max)
-    crime_rate = int(crime_rate)
-    zipcodes_attr = data_handling.corrZipAtt(min, max)
-    zipcodes_trees = data_handling.corrZipTrees(trees_bool)
-    zipcodes_crime = data_handling.corrZipCrime(crime_rate)
-
-
-    if(zipcodes_attr and zipcodes_trees and zipcodes_crime):
-        res = data_handling.commonZip(zipcodes_attr, zipcodes_crime, zipcodes_trees)
-
-        val = data_handling.BnbPerZip(res, bnb)
-
-        list_of_dicts = val.to_json(orient='records')
+    
+    #check if integer is between the correct range
+    
+    try:
+        min = int(min)
+        max = int(max)
+        crime_rate = int(crime_rate)
+        if not (1 <= crime_rate <= 4) or not (0 <= min <= 10) or not (5 <= max <=20):
+            raise HTTPException(status_code=422, detail='Invalid crime rate. It must be between 0 and 5')
+        else:
+            zipcodes_attr = data_handling.corrZipAtt(min, max)
+            zipcodes_trees = data_handling.corrZipTrees(trees_bool)
+            zipcodes_crime = data_handling.corrZipCrime(crime_rate)
+            res = data_handling.commonZip(zipcodes_attr, zipcodes_crime, zipcodes_trees)
+            val = data_handling.BnbPerZip(res, bnb)
+            list_of_dicts = val.to_json(orient='records')
 
         return list_of_dicts
-    else:
-        return {"error": "Data not found"}
-
+    except ValueError:
+        raise HTTPException(status_code=404, detail='Unfortunatly we were not able to access OpenWheather API')
 
 @app.get('/neighbourhood')
 def get_borough(neighbourhood):
-    data = data_handling.get_bnb_by_neighborhood(neighbourhood)
-    if (type(data)==pd.DataFrame):
-        if not(data.empty):
-            list = data.to_json(orient='records')
-            return list
-    else:
-        return {"error": "Data not found"}
 
+    try:
+        data = data_handling.get_bnb_by_neighborhood(neighbourhood)
+        list = data.to_json(orient='records')
+        return list
+    
+    except Exception:
+        raise HTTPException(status_code=404, detail='Input neighbourhood not valid')
 
 @app.get('/advanced')
 def airbnb_in_range(attractions, range):
-    attractions = literal_eval(attractions)
-    range = int(range)
-    center_point = advanced_research.calculate_center(attractions)
-    search_range = advanced_research.dist_to_deg(range, center_point)
-    filtered_df = advanced_research.find_airbnb_in_range(center_point, search_range)
-    list_of_dicts = filtered_df.to_json(orient = 'records')
-    return list_of_dicts
+    
+    try:
+        attractions = literal_eval(attractions)
+        range = int(range)
+
+        if not 100 <= range <= 100000:
+            raise HTTPException(status_code=422, detail='Invalid distance range. It should be between 100m and 100km')
+        else:
+            center_point = advanced_research.calculate_center(attractions)
+            search_range = advanced_research.dist_to_deg(range, center_point)
+            filtered_df = advanced_research.find_airbnb_in_range(center_point, search_range)
+            list_of_dicts = filtered_df.to_json(orient = 'records')
+            return list_of_dicts
+    
+    except ValueError:
+        raise HTTPException(status_code=404, detail='Invalid input type for distance range. It should be an integer')
 
 
 @app.get('/map')
