@@ -5,15 +5,17 @@ import json
 CACHE_FILE = "air_quality_cache.json"
 CACHE_EXPIRATION_TIME = 3600  # 1 hour in seconds
 
-def air_quality(key : str):
+
+def air_quality(key: str):
     '''
     Get the most recent value of AQI for the five NYC neighbourhood
 
-    Arg: 
+    Arg:
         key (int) : the OpenWheather API key to access the API.
-    
+
     Returns:
-        list : list of five dictionaries with the AQI value for each neighbourhood of NYC.
+        list :  list of five dictionaries with the AQI value
+                for each neighbourhood of NYC.
     '''
     current_date = str(int(time.time()))
 
@@ -52,9 +54,13 @@ def air_quality(key : str):
             quality = air_quality_status(mean_aqi)
 
             # Update cache
-            cached_data[cache_key] = {'timestamp': time.time(), 'mean_aqi': mean_aqi, 'key':key}
+            cached_data[cache_key] = {'timestamp': time.time(),
+                                      'mean_aqi': mean_aqi,
+                                      'key': key}
 
-        neighborhood_dict = {'Neighborhood': neighborhood, 'AQI': round(mean_aqi, 3), 'Quality': quality}
+        neighborhood_dict = {'Neighborhood': neighborhood,
+                             'AQI': round(mean_aqi, 3),
+                             'Quality': quality}
         airquality.append(neighborhood_dict)
 
     # Save updated cache
@@ -64,20 +70,22 @@ def air_quality(key : str):
     return airquality
 
 
-def air_quality_status(aqi : int):
+def air_quality_status(aqi: int):
     '''
-    For each value of AQI it returns the corresponding label based on the OpenWeather notation (https://openweathermap.org/api/air-pollution)
+    For each value of AQI it returns the corresponding label
+    lased on the OpenWeather notation
+    (https://openweathermap.org/api/air-pollution)
 
     Arg:
         aqi (int) : the AQI value retrived from OpenWeather API.
     '''
     if aqi <= 1:
         quality = 'Good'
-    elif aqi<=2:
+    elif aqi <= 2:
         quality = 'Fair'
-    elif aqi<=3:
-        quality =  'Moderate'
-    elif aqi<=4:
+    elif aqi <= 3:
+        quality = 'Moderate'
+    elif aqi <= 4:
         quality = 'Poor'
     else:
         quality = 'Very Poor'
