@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from .mymodules import data_handling
-from .mymodules import advanced_research
+from .mymodules import advance_search
 from .mymodules import air_quality
 import pandas as pd
 from fastapi import HTTPException
@@ -122,9 +122,9 @@ def airbnb_in_range(attractions, range):
         if not 100 <= range <= 100000:
             raise HTTPException(status_code=422, detail='Invalid distance range. It should be between 100m and 100km')
         else:
-            center_point = advanced_research.calculate_center(attractions)
-            search_range = advanced_research.dist_to_deg(range, center_point)
-            filtered_df = advanced_research.find_airbnb_in_range(center_point, search_range)
+            center_point = advance_search.calculate_center(attractions)
+            search_range = advance_search.dist_to_deg(range, center_point)
+            filtered_df = advance_search.find_airbnb_in_range(center_point, search_range)
             list_of_dicts = filtered_df.to_json(orient = 'records')
             return list_of_dicts
     
@@ -157,6 +157,6 @@ def attraction_list():
     Returns: 
         list : attraction id and attraction name for each attraction in the Location.csv file so we can use it in a form.
     '''
-    attractions = advanced_research.get_attractions_list()
+    attractions = advance_search.get_attractions_list()
 
     return attractions

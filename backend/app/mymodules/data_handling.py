@@ -49,7 +49,7 @@ def corrZipTrees(trees_bool : str):
     Compute the mean number of trees among all NYC neighbourhoods and return a list of zipcodes that match the user request.
 
     Arg:
-        trees_bool (bool) : value that reflect if the user wants to stay in a green area or not.
+        trees_bool (str) : value that reflect if the user wants to stay in a green area or not.
     
     Returns:
         list : 
@@ -96,7 +96,7 @@ def corrZipCrime(crime_rate : int):
 
 
 # Finds common zipcodes among three lists
-def commonZip(zip_1, zip_2, zip_3):
+def commonZip(zip_1 : list, zip_2 : list, zip_3 : list):
     '''
     finds all the common zipcodes among the three given lists
 
@@ -113,7 +113,7 @@ def commonZip(zip_1, zip_2, zip_3):
     
 
 # Find the cheapest zipcode for each zipcode in the list
-def BnbPerZip(zip_list, bnb_df):
+def BnbPerZip(zip_list : list, bnb_df : pd.DataFrame):
     '''
     finds all the airbnb that are located inside a given zipcode
 
@@ -129,7 +129,7 @@ def BnbPerZip(zip_list, bnb_df):
     return airbnb_df
 
 
-def get_bnb_by_neighborhood(target_neighbourhood):
+def get_bnb_by_neighborhood(target_neighbourhood : str):
     '''
     Get all the airbnbs that are located inside the given neighbourhood.
 
