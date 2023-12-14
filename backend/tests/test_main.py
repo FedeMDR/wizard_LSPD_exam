@@ -3,11 +3,10 @@ import sys
 from fastapi.testclient import TestClient
 from attractions import attractions_list
 import random
-import pytest
 
-# Add the project root to the sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-# Now you can do the relative import
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                '..')))
 from app.main import app
 
 
@@ -16,9 +15,11 @@ Execute this test by running on the terminal (from the app/) the command:
 pytest --cov=app --cov-report=html tests/
  """
 
+
 client = TestClient(app)
 
-#this test will take some time to execute because it needs to wait the response of an API
+
+# This test will take some time to execute because of the API call
 def test_index_correctkey_nocache():
     CACHE_FILE = 'air_quality_cache.json'
     with open(CACHE_FILE, 'w') as cache_file:
@@ -31,6 +32,7 @@ def test_index_correctkey_nocache():
         assert len(response.json()) == 1
         assert response.status_code == 404
 
+
 def test_index_wrongkey():
     response = client.get("/index/fjkdashjfdjhsafhdjsahfjhds")
     assert response is not None
@@ -40,6 +42,7 @@ def test_index_wrongkey():
         assert len(response.json()) == 1
         assert response.status_code == 404
 
+
 def test_index_correctkey_withcache():
     response = client.get("/index/596dff3ac05aeb906e63803d2bfcf01a")
     assert response is not None
@@ -48,7 +51,8 @@ def test_index_correctkey_withcache():
     else:
         assert len(response.json()) == 1
         assert response.status_code == 404
-        
+
+
 def test_wrong_inputrange_search():
     response = client.get(
         "/search",
@@ -60,6 +64,7 @@ def test_wrong_inputrange_search():
         }
     )
     assert response.status_code == 422
+
 
 def test_wrong_inputtype_tree():
     response = client.get(
@@ -73,6 +78,7 @@ def test_wrong_inputtype_tree():
     )
     assert response.status_code == 404
 
+
 def test_wrong_inputtype_crime():
     response = client.get(
         "/search",
@@ -84,6 +90,7 @@ def test_wrong_inputtype_crime():
         }
     )
     assert response.status_code == 404
+
 
 def test_cornercase_search2():
     response = client.get(
@@ -110,6 +117,7 @@ def test_cornercase_search3():
     )
     assert response.status_code == 200
 
+
 def test_cornercase_search4():
     response = client.get(
         "/search",
@@ -121,7 +129,6 @@ def test_cornercase_search4():
         }
     )
     assert response.status_code == 200
-
 
 
 def test_right_search_main():
@@ -144,8 +151,8 @@ def test_wrong_neighbourhood_main():
                     'neighbourhood': 'Ca tron'
                 }
             )
-    
     assert response.status_code == 404
+
 
 def test_wrong_neighbourhood_main():
     response = client.get(
@@ -180,13 +187,12 @@ def test_advanced_feature():
     def random_pick(attr_list, n):
         n = min(n, len(attr_list))
         return random.sample(attr_list, n)
-    
 
     response = client.get(
             'http://backend/advanced',
             params={
-                'attractions' : [random_pick(attractions_list, 4)],
-                'range' : 1000
+                'attractions': [random_pick(attractions_list, 4)],
+                'range': 1000
             }
         )
     assert response.status_code == 200
@@ -194,34 +200,31 @@ def test_advanced_feature():
 
 def test_advanced_feature_extremecaseLow():
 
-
     def random_pick(attr_list, n):
         n = min(n, len(attr_list))
         return random.sample(attr_list, n)
-    
 
     response = client.get(
             'http://backend/advanced',
             params={
-                'attractions' : [random_pick(attractions_list, 4)],
-                'range' : 1
+                'attractions': [random_pick(attractions_list, 4)],
+                'range': 1
             }
         )
     assert response.status_code == 422
 
-def test_advanced_feature_extremecaseHigh():
 
+def test_advanced_feature_extremecaseHigh():
 
     def random_pick(attr_list, n):
         n = min(n, len(attr_list))
         return random.sample(attr_list, n)
-    
 
     response = client.get(
             'http://backend/advanced',
             params={
-                'attractions' : [random_pick(attractions_list, 4)],
-                'range' : 1000000000000000000
+                'attractions': [random_pick(attractions_list, 4)],
+                'range': 1000000000000000000
             }
         )
     assert response.status_code == 422
@@ -229,34 +232,31 @@ def test_advanced_feature_extremecaseHigh():
 
 def test_advanced_feature_invalidInput():
 
-
     def random_pick(attr_list, n):
         n = min(n, len(attr_list))
         return random.sample(attr_list, n)
-    
 
     response = client.get(
             'http://backend/advanced',
             params={
-                'attractions' : [random_pick(attractions_list, 4)],
-                'range' : 'pippo'
+                'attractions': [random_pick(attractions_list, 4)],
+                'range': 'pippo'
             }
         )
     assert response.status_code == 404
 
-def test_advanced_feature_invalidInputNumeric():
 
+def test_advanced_feature_invalidInputNumeric():
 
     def random_pick(attr_list, n):
         n = min(n, len(attr_list))
         return random.sample(attr_list, n)
-    
 
     response = client.get(
             'http://backend/advanced',
             params={
-                'attractions' : [random_pick(attractions_list, 4)],
-                'range' : 0.10
+                'attractions': [random_pick(attractions_list, 4)],
+                'range': 0.10
             }
         )
     assert response.status_code == 404
@@ -267,11 +267,11 @@ def test_map_main():
     def random_pick(attr_list, n):
         n = min(n, len(attr_list))
         return random.sample(attr_list, n)
-    
+
     response = client.get(
         'http://backend/map',
         params={
-            'attraction' : [random_pick(attractions_list, 4)]
+            'attraction': [random_pick(attractions_list, 4)]
         }
     )
     assert response.status_code == 200
