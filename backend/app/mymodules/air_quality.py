@@ -5,7 +5,16 @@ import json
 CACHE_FILE = "air_quality_cache.json"
 CACHE_EXPIRATION_TIME = 3600  # 1 hour in seconds
 
-def air_quality(key):
+def air_quality(key : str):
+    '''
+    Get the most recent value of AQI for the five NYC neighbourhood
+
+    Arg: 
+        key (int) : the OpenWheather API key to access the API.
+    
+    Returns:
+        list : list of five dictionaries with the AQI value for each neighbourhood of NYC.
+    '''
     current_date = str(int(time.time()))
 
     neigh = {'Bronx': (40.844784, -73.864830),
@@ -55,7 +64,13 @@ def air_quality(key):
     return airquality
 
 
-def air_quality_status(aqi):
+def air_quality_status(aqi : int):
+    '''
+    For each value of AQI it returns the corresponding label based on the OpenWeather notation (https://openweathermap.org/api/air-pollution)
+
+    Arg:
+        aqi (int) : the AQI value retrived from OpenWeather API.
+    '''
     if aqi <= 1:
         quality = 'Good'
     elif aqi<=2:

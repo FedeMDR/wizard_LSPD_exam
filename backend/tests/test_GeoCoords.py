@@ -7,7 +7,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Now you can do the relative import
 from app.main import app
-from app.mymodules.advanced_research import GeoCoords
+from app.mymodules.advance_search import GeoCoords
 print(sys.path)
 """
 Execute this test by running on the terminal (from the app/) the command:
