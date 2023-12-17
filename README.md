@@ -1,23 +1,118 @@
-# swdevel-lab-hfarm
- Skeleton Project for the Lab of Software Project Development
+# Code Wizards Project
 
-# Flask and FastAPI Dockerized Project
+## Table of Contents
 
-This project demonstrates a simple web application using Flask as the frontend and FastAPI as the backend. The frontend allows querying birthdays from the backend using a form. The project is Dockerized for easy deployment.
+1. [Group composition](#1-group-composition)
+2. [Name and scope of the project](#2-name-and-scope-of-the-project)
+3. [Description of the project](#3-description-of-the-project)
+4. [Architecture](#4-architecture)
+5. [Project structure](#5-project-structure)
+6. [Datasets](#6-datasets)
+7. [Prerequisites](#7-prerequisites)
+8. [Usage](#8-usage)
+9. [Testing](#9-testing)
+10. [License](#10-license)
 
-## Architecture
+## 1. Group composition
+
+- Aleccia Martina 889901
+- Blasut Giovanni 889942
+- Di Lorenzo Simone 889833
+- Federico Madaro 888863
+
+## 2. Name and scope of the project
+
+### Wizard BnB: Safer, Greener and Closer to You
+
+The primary goal of this project is to enhance user experience on the Airbnb platform by introducing innovative filters like air quality, crime rates, trees location and local attractions.
+
+## 3. Description of the project
+
+### **Home Page**
+
+The Home Page serves as the entry point into our project. This page is only the beginning of the user's experience. On the screen we can see the name of the project, the home page button, the search button, the advanced search button and 5 boxes representing the five neighbourhoods of New York City:
+
+1. Manhattan
+2. Queens
+3. Bronx
+4. Brooklyn
+5. Staten Island
+
+Each borough section includes the current for the area ***Air Quality Index (AQI)*** and its associated level.
+
+> **NOTE:** loading the Home Page might take up to 30 seconds or more, depending on the speed of the OpenWeather API. Please wait for it to fully load.
+
+Interactive buttons for each borough lead to a new page where users can search for Airbnb accommodations. Users can sort and order these accommodations by price or reviews, either in ascending or descending order.
+
+> **EXAMPLE**: To find the cheapest accommodation in Manhattan, click on "Manhattan Airbnb", select "Price" as sorting key, choose "Ascending" under as sorting order, and then click "Search". The list will then be displayed.
+
+### **Search Page**
+
+The Search Page, accessible from the main menu, allows users to apply three filters and two sort functions to find accommodations that suit the preference of the users.
+
+[Below](#6-datasets) you can find the explanation about the datasets we used and how we extracted data from them
+
+Here you can find out how the filters in the search page affect the results that the users will be displayed
+
+#### How much do you care for a crime-free area?
+
+Users can decide if the crime rate is important, selecting one of the four different options:
+
+- Not at all
+- Very little
+- Enough
+- Extremely
+
+According to what the user chooses he will see bnbs that are located in areas that are rated with the corresponding crime rate.
+
+#### How many attractions do you plan on visiting?
+
+The second choice a user can do is decide how many attractions he want to visit. With this filter he can decide between three options:
+
+- "0-5"
+- "5-10"
+- "10-20"
+
+According to what the user chooses he will see bnbs that are located in areas in which are located a number of attraction included in the selected range.
+
+#### Do you want to be in a green area?
+
+The user can select if being in a green area is important or not, clicking one of the two options:
+
+- True
+- False
+
+According to what the user chooses he will see bnbs that are located in areas in which the number of trees is above or below the mean of trees located among all boroughs.
+
+#### Sort by
+
+Users can decide to sort the list considering the price or the reviews.
+
+#### Sorting Order
+
+Users can decide to display the higher or the lowest solutions, based on the selection **Sort by**
+
+### **Advance Search**
+
+In this page, the user can select the attractions they want to visit from a list, choose the radius for their search, and then sort the results by price or review in both descending and ascending order.
+
+With these choices, a list and an interactive map will be displayed. The list of results will appear at the bottom of the page, showing accommodations that are within the radius of the central point in relation to all the attractions.
+
+The map is displayed at the top of the page.
+
+## 4. Architecture
 
 The project follows a simple client-server architecture:
 
 1. **Frontend (Flask):**
-   - Represents the user interface or client side.
+   - Represents the user interface.
    - Built with Flask, a lightweight web framework for Python.
    - Responsible for rendering web pages and user interaction, including the form for querying the backend.
 
 2. **Backend (FastAPI):**
-   - Represents the server or backend of the application.
+   - Represents the backend of the application.
    - Built with FastAPI, a modern web framework for building APIs with Python.
-   - Handles requests from the frontend, including querying birthdays and providing the current date.
+   - Handles requests from the frontend, including specific parameters on Airbnb in New York City.
 
 3. **Docker Compose:**
    - Orchestrates the deployment of both frontend and backend as separate containers.
@@ -25,167 +120,204 @@ The project follows a simple client-server architecture:
    - Simplifies the deployment and management of the entire application.
 
 ### Communication
+
 Bidirectional communication is established between the Frontend (Flask) and Backend (FastAPI). Docker Compose facilitates this communication, allowing the components to work together seamlessly.
 
-## Project Structure
+## 5. Project Structure
 
-- `backend/`: FastAPI backend implementation.
-    - Dockerfile: Dockerfile for building the backend image.
-    - main.py: Main backend application file.
-    - requirements.txt: List of Python dependencies for the backend.
-- `frontend/`: Flask frontend implementation.
-    - Dockerfile: Dockerfile for building the frontend image.
-    - static/: Folder for static files (CSS, JavaScript, etc.).
-    - templates/: Folder for HTML templates.
-    - main.py: Main frontend application file.
-    - requirements.txt: List of Python dependencies for the frontend.
-- `docker-compose.yml`: Docker Compose configuration for running both frontend and backend.
+Here you can see the our project structure, illustrating every forlder, sub-folder and file
 
-## Prerequisites
+```bash
+wizard_LSPD_exam
+|-- backend/
+|   |-- app/
+|   |   |-- package/
+|   |   |   |-- __init__.py
+|   |   |   |-- advanced_search.py
+|   |   |   |-- air_quality.py
+|   |   |   `-- data_handling.py
+|   |   `-- main.py
+|   |-- tests/
+|   |   |-- attractions.py
+|   |   |-- test_air_quality.py
+|   |   |-- test_GeoCoords.py
+|   |   `-- test_main.py
+|   |-- Dockerfile
+|   `-- requirements.txt
+|-- frontend/
+|   |-- app/
+|   |   |-- static/
+|   |   |   |-- attraction_icon.png
+|   |   |   |-- Bronx.webp
+|   |   |   |-- Brooklyn.webp
+|   |   |   |-- Manhattan.avif
+|   |   |   |-- popup.css
+|   |   |   |-- Queens.jpg
+|   |   |   `-- StatenIsland.jpg
+|   |   |-- templates/
+|   |   |   |-- advanced.html
+|   |   |   |-- base.html
+|   |   |   |-- index.html
+|   |   |   |-- neighbourhood.html
+|   |   |   `-- search.html
+|   |   `-- main.py
+|   |-- Dockerfile
+|   `-- requirements.txt
+|-- .gitattributes
+|-- .gitignore
+|-- docker-compose.yml
+|-- LICENSE.txt
+`-- README.md
+```
 
-- Docker
-- Visual Studio Code (Optional, for debugging)
+## 6. Datasets
 
-## Usage
+In the developing of our project we began by searching some csv files that could help us do deliver the best possible combination of bnbs to our users.
 
-1. Clone the repository and navigate in the directory:
+We came up with four datasets:
 
-    ```bash
-    git clone REPO_URL
-    cd swdevel-lab-hfarm
-    ```
+1. AirBnb.csv
+2. CrimeCount.csv
+3. Locations.csv
+4. Trees.csv
 
-2. Build and run the Docker containers:
+### AirBnb.csv
 
-    ```bash
-    docker-compose up --build
-    ```
+Contains a list of all AirBnbs listed in the NYC area, including various data like the listing url, reviews, price, house ameneties ecc.
 
-    This will start both the frontend and backend containers.
-    
-> **NOTE:** Uncomment the lines in the Dockerfiles that follow the section labeled `Command to run the application` and comment out the ones labeled `Command to keep the container running`. This will allow you to access the backend and frontend, as described in Point 3.
+### CrimeCount.csv
 
-3. Open your web browser and navigate to [http://localhost:8080](http://localhost:8080) to access the `frontend` and [http://localhost:8081](http://localhost:8081) to access the `backend`.
+Contains two columns:
 
-4. Use the form on the frontend to query birthdays from the backend.
+1. **Zipcode**: a list of zipcodes in the NYC area
+2. **Count**: the number of crimes registered for each zipcode
 
-## Shutting Down the Docker Containers
+### Location.csv
 
-To shut down the running Docker containers, you can use the following steps:
+A list of tourist locations with the corresponding data:
 
-1. Open a terminal.
+1. **Tourist_Spot**: the name of the location
+2. **Address**: the address of the location
+3. **Latitude**: the latitude of the location
+4. **Longitude**: the longitude of the location
+5. **Zipcode**: the zipcode of the location
 
-2. Navigate to the project root directory.
+### Trees.csv
 
-3. Run the following command to stop and remove the Docker containers:
+Contains two columns:
 
-    ```bash
-    docker-compose down
-    ```
+1. **Zipcode**: a list of zipcodes in the NYC area
+2. **Count**: the number of trees for each zipcode
 
-## Starting and Stopping Containers Individually
+## 7. Prerequisites
 
-If you need to start or stop the containers individually, you can use the following commands:
+- Download the [dataset's folder](https://drive.google.com/drive/folders/1rBa1dcj_KIfOrYpVGIKuLA_glkTgy47f?usp=share_link/).
+- Docker: To build and run the containerized application.
+- Visual Studio Code (suggested).
+- Python (latest version).
+- Git: For cloning and managing the project repository.
+- Web Browser: to use the application.
 
-- **Start Frontend Container:**
+## 8. Usage
 
-    ```bash
-    docker-compose up frontend
-    ```
+> **NOTE:** Before start, remember to **download the datasets**. Since some of them are large datasets, we decided to upload them in this GoodleDrive [folder](https://drive.google.com/drive/folders/1rBa1dcj_KIfOrYpVGIKuLA_glkTgy47f?usp=share_link/).
 
-- **Stop Frontend Container:**
-
-    ```bash
-    docker-compose stop frontend
-    ```
-
-- **Start Backend Container:**
-
-    ```bash
-    docker-compose up backend
-    ```
-
-- **Stop Backend Container:**
-
-    ```bash
-    docker-compose stop backend
-    ```
-
-Make sure to replace `frontend` and `backend` with the appropriate service names from your `docker-compose.yml` file.
-
-### Notes:
-
-When stopping containers individually, the `docker-compose down` command is not required.
-Now you can manage the lifecycle of your Docker containers more flexibly.
-
-
-## Debugging with Visual Studio Code and Docker Extension
-
-1. Open the project in Visual Studio Code:
-
-    ```bash
-    code .
-    ```
-
-2. Set breakpoints in your Python code as needed.
-
-3. Build and run the Docker containers:
+1. Clone the repository and navigate to the directory:
 
     ```bash
-    docker-compose up --build
+    git clone https://github.com/FedeMDR/wizard_LSPD_exam.git
     ```
 
-    Ensure that your Docker containers are running.
+1. After downloading the datasets, move inside the /backend/app/folder and paste the dataset folder inside it.
+    >**NOTE:** You must renaime the folder containing the datasets as "Datasets".
 
-4a. Install the [Docker extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) for Visual Studio Code.
-4b. Install the [Remote Development Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) for Visual Studio Code
+1. Open the project folder using Visual Studio Code, install the following extentions using VS:
 
-5. Open the "Docker" view in Visual Studio Code by clicking on the Docker icon in the Activity Bar.
+    - [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
+    - [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
 
-6. Under "Containers," you should see your running containers. Right-click on the container running your Flask or FastAPI application.
+1. Open the terminal from the menu and type the following command:
 
-7. Select "Attach Visual Studio Code" from the context menu. This will configure the container for debugging.
-
-8. Open the Run view in Visual Studio Code and select the "Python: Remote Attach" configuration.
-
-9. Click the "Run" button to start the debugger.
-
-10. Access the frontend in your web browser and trigger the actions you want to debug.
-
-### Notes:
-
-- Ensure that your Docker containers are running (`docker-compose up --build`) before attaching Visual Studio Code.
-
-- Adjust the container name in the "Docker: Attach to Node" configuration if needed.
-
-- The provided configurations assume that your Flask or FastAPI application is running with the debugger attached. Adjust the configurations if needed.
-
-- If using Flask, ensure that the Flask application is started with the `--no-reload` option to prevent automatic reloading, which can interfere with debugging.
-
-- Debugging FastAPI requires configuring the FastAPI application to run with the `--reload` option. Update the FastAPI Dockerfile CMD accordingly.
-
-- After the debugger is attached, you can use breakpoints, inspect variables, and step through your code as needed.
-
-
-## Adding New Modules to a Running Docker Container
-
-1. **Install Additional Modules:**
     ```bash
-    pip install new_module
+    docker compose build backend
     ```
-   Replace `new_module` with the names of the module you want to install.
 
-2. **Verify Installed Modules:**
     ```bash
-    pip list
+    docker compose build frontend
     ```
-   This command displays a list of installed Python packages, including the newly added modules.
 
-3. **Optional: Update requirements.txt:**
     ```bash
-    pip freeze > requirements.txt
+    docker compose up backend
     ```
-   If you want to keep track of the installed modules, you may choose to update the `requirements.txt` file inside the container.
 
+     >**NOTE:** Execute the following command in another Terminal window.
 
-Now, the additional Python modules are installed in the running container, and you've performed these actions directly from the VS Code terminal. If these changes are intended for production, consider updating the `requirements.txt` file and rebuilding the Docker container.
+    ```bash
+    docker compose up frontend
+    ```
+
+    This will start both the frontend and backend containers as defined in your docker-compose.yml file.
+
+1. Open the docker extention in VS Code, under the containers tab you should by now see two containers that are running (the ones with the green arrows).\
+Right click on both of them an then click on "attach visual studio".\
+Now you should have two new VS Code windows, one for the backend and one for the frontend.
+
+1. This step must be replicated in both frontend and backend: Open folder /app/app, and there you will find the working area.
+
+1. Go to the run and debug section and run the backend and then the frontend.
+
+    >**NOTE:** Is foundamental to execute the backend first and only after it is fully loaded you can run and debug the frontend.
+
+    When the backend is fully loaded you should see in the terminal an output that look like this:
+
+    ```bash
+    INFO:     Will watch for changes in these directories: ['/app']
+    INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+    INFO:     Started reloader process [8030] using StatReload
+    INFO:     Started server process [8323]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    ```
+
+    Now run and debug the frontend, wait until this message appears.
+
+    ```bash
+    * Serving Flask app 'main'
+    * Debug mode: on
+    WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+    * Running on all addresses (0.0.0.0)
+    * Running on http://127.0.0.1:80
+    * Running on http://172.19.0.2:80
+    Press CTRL+C to quit
+    * Restarting with stat
+    * Debugger is active!
+    * Debugger PIN: 374-045-381
+    ```
+
+1. Open your web browser and navigate to [http://localhost:8080](http://localhost:8080) to access the `frontend`.
+
+1. On the frontend, you can use the provided forms to:
+
+- Search for Airbnb listings based on criteria like proximity to attractions, green areas, and crime rates.
+- Perform advanced searches within a specified radius from selected attractions.
+- View listings by neighbourhood and sort them according to price or ratings.
+
+>**NOTE:** Remember to shut down the Docker containers when you're done by typing:
+
+```bash
+CTRL + C
+```
+
+>in both the frontend and backend terminal to shutdown the runnig processes.
+
+## 9. Testing
+
+We've implemented some tests to verify the correct funcitionality of our backend. To run those tests, open the backend VS Code window, open the terminal and type the following command:
+
+```bash
+    pytest --cov=app --cov-report=html tests/
+```
+
+## 10. License
+
+Distributed under GNU GPL licence. See LICENSE.txt for more information.
