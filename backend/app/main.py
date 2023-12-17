@@ -12,25 +12,6 @@ app = FastAPI()
 
 # Creating dataframes with pandas
 ATTRACTION = pd.read_csv('Datasets/Location.csv')
-AIRBNB = pd.read_csv('Datasets/AirBnb.csv')
-
-
-def convert_price(price_str):
-    '''
-    convert the price in Airbnb dataframe from a string to an integers
-
-    Arg:
-        price (str) : the price as a string
-
-    Returns:
-        int : the price converted to int
-    '''
-    prezzo_float = float(price_str.replace('$', '').replace(',', ''))
-
-    return int(prezzo_float)
-
-
-AIRBNB['price'] = AIRBNB['price'].apply(convert_price)
 
 
 @app.get('/index/{key}')
