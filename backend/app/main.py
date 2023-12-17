@@ -83,7 +83,7 @@ def search_bnb(min, max, trees_bool, crime_rate):
             zipcodes_trees = data_handling.corr_zip_trees(trees_bool)
             zipcodes_crime = data_handling.corr_zip_crime(crime_rate)
             res = data_handling.common_zip(zipcodes_attr, zipcodes_crime, zipcodes_trees)
-            val = data_handling.bnb_per_zip(res, AIRBNB)
+            val = data_handling.bnb_per_zip(res)
             list_of_dicts = val.to_json(orient='records')
 
         return list_of_dicts
