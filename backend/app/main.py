@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from .mymodules import data_handling
-from .mymodules import advance_search
-from .mymodules import air_quality
+from .package import data_handling
+from .package import advance_search
+from .package import air_quality
 import pandas as pd
 from fastapi import HTTPException
 from ast import literal_eval
