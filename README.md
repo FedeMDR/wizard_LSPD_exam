@@ -211,7 +211,7 @@ Contains two columns:
 
 ## 7. Prerequisites
 
-- Download the [dataset's folder](https://drive.google.com/drive/folders/1rBa1dcj_KIfOrYpVGIKuLA_glkTgy47f?usp=share_link/).
+- Download the [dataset's folder](https://drive.google.com/drive/folders/18reX7mMlaWP0m0VFAf3fFZo0gUUF57N4?usp=sharing).
 - Docker: To build and run the containerized application.
 - Visual Studio Code (suggested).
 - Python (latest version).
