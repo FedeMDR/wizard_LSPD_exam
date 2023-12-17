@@ -121,8 +121,8 @@ def common_zip(zip_1: list, zip_2: list, zip_3: list):
     return list(res)
 
 
-# Find the cheapest zipcode for each zipcode in the list
-def bnb_per_zip(zip_list: list, bnb_df: pd.DataFrame):
+# Finds all the airbnb that are located inside a given zipcode
+def bnb_per_zip(zip_list: list):
     '''
     finds all the airbnb that are located inside a given zipcode
 
@@ -135,11 +135,12 @@ def bnb_per_zip(zip_list: list, bnb_df: pd.DataFrame):
         pandas DataFrame :  a subset of our original dataframe
                             containing only the selected airbnbs
     '''
-    airbnb_df = bnb_df[bnb_df['zipcode'].isin(zip_list)]
+    airbnb_df = AIRBNB[AIRBNB['zipcode'].isin(zip_list)]
 
     return airbnb_df
 
 
+# Get all the airbnbs that are located inside the given neighbourhood
 def get_bnb_by_neighborhood(target_neighbourhood: str):
     '''
     Get all the airbnbs that are located inside the given neighbourhood.
