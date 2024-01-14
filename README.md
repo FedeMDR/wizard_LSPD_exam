@@ -212,9 +212,10 @@ Contains a list of all AirBnbs listed in the NYC area, including various data li
 #### Preliminary steps
 Starting from the original dataset, you will have to perform the following steps using a python script:
 - Add a column to the dataset containing the zipcodes of the crimes (You can use Reverse Geocoding)
+> **NOTE:** Reverse Geocoding is used to convert geographic coordinates into zip codes. This step involves adding a new column to the dataset with zip codes derived from crime locations. For implementation, refer to [Reverse Geocoding API Documentation](https://developers.google.com/maps/documentation/geocoding/overview?hl=it).
 - Create a new dataset containg two columns:
     - zipcode (a list of unique zipcodes)
-    - count (the number of crime in the relative zipcode)
+    - count (the number of crimes in the relative zipcode)
 - Now use a count_function such that:
     - if the zipcode is not present in the new dataset, insert it in the column zipcode and count equal 1
     - else, increment its count by 1
