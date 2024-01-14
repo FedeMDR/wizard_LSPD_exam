@@ -14,6 +14,12 @@ FASTAPI_BACKEND_HOST = 'http://backend'
 
 
 def request_attr_list():
+    '''
+     send a request to the backend to get the list of all the unique attraction in the attraction dataset.
+
+    Returns:
+        list :  a list of all the attractions' name stored inside the attraction dataset.
+    '''
     try:
         # Make the HTTP request within the Flask request context
         with app.test_request_context():
@@ -65,6 +71,14 @@ class AdvancedSearch(FlaskForm):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    '''
+    A route handler for the index page that makes a request to a backend service and 
+    renders the 'index.html' template with the retrieved data.
+
+    Returns:
+        render_template: Renders 'index.html' with either a list of boroughs 
+        (if the backend request is successful) or an error message (if the request fails).
+    '''
     response = requests.get('http://backend/index/596dff3ac05aeb906e63803d2bfcf01a')
     error_message = None
 
@@ -80,6 +94,15 @@ def index():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    '''
+    A route handler for the search page that processes the search form, cast data in their correct format, 
+    and renders the 'search.html' template with the search results or an error message.
+
+    Returns:
+        render_template: Renders 'search.html' with the search results, the search form, 
+        and an optional error message. 
+        If the search is not successful, it renders the an error message depending on the error code.
+    '''
     form = SeachBnBForm()
     error_message = None
 
@@ -138,6 +161,15 @@ def search():
 
 @app.route('/neighbourhood', methods=['GET', 'POST'])
 def return_borough():
+    '''
+    A route handler for the neighbourhood page that processes the neighbourhood search form 
+    and renders the 'neighbourhood.html' template with the search results, or an error message.
+
+    Returns:
+        render_template: Renders 'neighbourhood.html' with the search results, the neighbourhood search form, 
+        and an optional error message. 
+        If the search is not successful, it renders the an error message depending on the error code.
+    '''
     neighbourhood = request.args.get('neighbourhood')
     form = neighbourhoodBnbForm()
     error_message = None
@@ -175,6 +207,15 @@ def return_borough():
 
 @app.route('/advanced', methods=['GET', 'POST'])
 def advanced():
+    '''
+    A route handler for the advanced search page that processes the advanced search 
+    form and renders the 'advanced.html' template with the search results or an error message.
+
+    Returns:
+        render_template: Renders 'advanced.html' with the advanced search results, 
+        a list of attractions, the search form, and an optional error message. 
+        If the search is not successful, it renders the an error message depending on the error code.
+    '''
     form = AdvancedSearch()
     error_message = None
     if form.validate_on_submit():
