@@ -174,26 +174,73 @@ wizard_LSPD_exam
 
 In the developing of our project we began by searching some csv files that could help us do deliver the best possible combination of bnbs to our users.
 
-We came up with four datasets:
+We came up with four datasets (**between brackets you can find the links to the original ones**):
 
-1. AirBnb.csv
-2. CrimeCount.csv
-3. Locations.csv
-4. Trees.csv
+1. AirBnb.csv (http://data.insideairbnb.com/united-states/ny/new-york-city/2024-01-05/data/listings.csv.gz)
+2. CrimeCount.csv (https://www.kaggle.com/datasets/adamschroeder/crimes-new-york-city)
+3. Locations.csv  (https://www.kaggle.com/datasets/anirudhmunnangi/348-new-york-tourist-locations?resource=download)
+4. Trees.csv (https://www.kaggle.com/datasets/nycparks/tree-census?select=new_york_tree_census_2015.csv)
+
+Since in the [dataset's folder](https://drive.google.com/drive/folders/18reX7mMlaWP0m0VFAf3fFZo0gUUF57N4?usp=sharing) we uploaded already modified datasets, we will also provide preliminary steps to follow if you want to download the original datasets and modify them on your own.
+
 
 ### AirBnb.csv
 
+#### Preliminary steps
+You will have to perform the following steps using a python script:
+- Drop every column except the following ones:
+    - listing_url
+    - name
+    - description
+    - picture_url
+    - host_url
+    - neighbourhood_cleansed
+    - neighbourhood_group_cleansed
+    - latitude
+    - longitude
+    - zipcode
+    - price
+    - review_scores_rating
+- Drop every row containing a Nan or Null value in its column 
+
+#### Dataset content
 Contains a list of all AirBnbs listed in the NYC area, including various data like the listing url, reviews, price, house ameneties ecc.
+
 
 ### CrimeCount.csv
 
+#### Preliminary steps
+Starting from the original dataset, you will have to perform the following steps using a python script:
+- Add a column to the dataset containing the zipcodes of the crimes (You can use Reverse Geocoding)
+> **NOTE:** Reverse Geocoding is used to convert geographic coordinates into zip codes. This step involves adding a new column to the dataset with zip codes derived from crime locations. For implementation, refer to [Reverse Geocoding API Documentation](https://developers.google.com/maps/documentation/geocoding/overview?hl=it).
+- Create a new dataset containg two columns:
+    - zipcode (a list of unique zipcodes)
+    - count (the number of crimes in the relative zipcode)
+- Now use a count_function such that:
+    - if the zipcode is not present in the new dataset, insert it in the column zipcode and count equal 1
+    - else, increment its count by 1
+
+
+#### Dataset content
 Contains two columns:
 
 1. **Zipcode**: a list of zipcodes in the NYC area
 2. **Count**: the number of crimes registered for each zipcode
 
+
 ### Location.csv
 
+#### Preliminary steps
+Starting from the original dataset, you will have to perform the following steps:
+- Add two columns to the original dataset:
+    - Latitude (latitude of the location)
+    - Longitude (longitude of the location)
+One way to do it is the following:
+- Import the dataset on google sheet
+- Install Geocode by Awesome Table
+- Use the Add-ons section to run the extention on the column Address
+
+#### Dataset content
 A list of tourist locations with the corresponding data:
 
 1. **Tourist_Spot**: the name of the location
@@ -204,6 +251,15 @@ A list of tourist locations with the corresponding data:
 
 ### Trees.csv
 
+#### Preliminary steps
+You will have to perform the following steps using a python script:
+- Drop every column except for the following one:
+    - zipcode
+- Create a new pandas dataframe which contains the following two columns:
+    - zipcode (the list of zipcodes that appear in the previous dataframe, counted just once)
+    - count (the number of time that zipcodes appears in the previous dataframe)
+
+#### Dataset content
 Contains two columns:
 
 1. **Zipcode**: a list of zipcodes in the NYC area
